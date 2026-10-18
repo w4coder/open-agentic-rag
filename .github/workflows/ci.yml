@@ -1,0 +1,33 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  test-and-eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -r requirements-dev.lock && pip install --no-deps -e .
+      - run: ruff check src tests evals
+      - run: pytest -q                       # topology, security, budgets, durability, LLM-brain resilience
+      - run: python -m evals.run_eval --min-correct 1.0 --min-trajectory 1.0   # deterministic regression gate
+      # open-rag is pinned by URL (not on PyPI), so it is left out of the CVE audit.
+      - run: pip install pip-audit && grep -v '^open-rag @' requirements.lock > /tmp/req.txt && pip-audit -r /tmp/req.txt
+      - run: docker build -f deploy/Dockerfile -t open-agentic-rag:ci .
+  # The LLM brain is evaluated, not unit-tested. Opt-in: set the repository variable
+  # RUN_REAL_EVALS=true and the OPENAI_API_KEY secret (LANGSMITH_API_KEY optional).
+  eval-llm-brain:
+    if: github.ref == 'refs/heads/main' && vars.RUN_REAL_EVALS == 'true'
+    needs: test-and-eval
+    runs-on: ubuntu-latest
+    env:
+      AGENT_LLM_PROVIDER: openai
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      LANGSMITH_API_KEY: ${{ secrets.LANGSMITH_API_KEY }}
+      LANGSMITH_TRACING: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install -r requirements-dev.lock && pip install --no-deps -e .
+      - run: python -m evals.run_eval --langsmith --min-correct 0.9 --min-trajectory 0.9

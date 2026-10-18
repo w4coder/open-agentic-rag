@@ -1,0 +1,10 @@
+{"id":"s1","kind":"simple","question":"What does error NB-4021 mean?","must_contain":["expired"],"expect_nodes":["research"],"answerable":true}
+{"id":"s2","kind":"simple","question":"How long does an OAuth access token live?","must_contain":["15 minutes"],"expect_nodes":["research"],"answerable":true}
+{"id":"m1","kind":"multi_hop","question":"What is the Business plan rate limit and what is the Enterprise availability SLA?","must_contain":["3000","99.99"],"expect_nodes":["plan","research","synthesize","verify"],"min_research":2,"answerable":true}
+{"id":"m2","kind":"multi_hop","question":"What does error NB-4030 mean and how long do OAuth access tokens live?","must_contain":["scope","15 minutes"],"expect_nodes":["plan","research"],"min_research":2,"answerable":true}
+{"id":"m3","kind":"multi_hop","question":"How long are database snapshots retained and what is the maximum size of one object?","must_contain":["14 days","5 TB"],"expect_nodes":["plan","research"],"min_research":2,"answerable":true}
+{"id":"q1","kind":"sql","question":"What was the total revenue in Q1 by region?","must_contain":["region=EMEA, revenue=200000"],"expect_nodes":["propose_sql","run_sql"],"answerable":true}
+{"id":"w1","kind":"web","question":"What is the latest Nimbus incident status?","must_contain":["no open incidents"],"expect_nodes":["research"],"answerable":true}
+{"id":"u1","kind":"unanswerable","question":"What is the CEO's favourite colour?","must_contain":[],"expect_nodes":["research","replan"],"answerable":false}
+{"id":"u2","kind":"unanswerable","question":"Does Nimbus support quantum computing instances?","must_contain":[],"expect_nodes":["research"],"answerable":false}
+{"id":"c1","kind":"chitchat","question":"Hello!","must_contain":[],"expect_nodes":["direct_answer"],"forbid_nodes":["research"],"answerable":true}

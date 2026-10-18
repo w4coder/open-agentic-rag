@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+evals/results/
+.tools/
+.qdrant/
+.qdrant-initialized
+data/uploads/
+*.sqlite
+*.db
+*.log
+# Never publish PDFs (benchmark papers, user documents)
+*.pdf
